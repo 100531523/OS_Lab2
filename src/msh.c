@@ -116,10 +116,6 @@ int n_elem = 0;
 
 /* myhistory */
 // "history" points to an array of command structs
-// create another pointer to iterate down the array?
-// call print command every time?
-// how to shift items once we reach a history length over 20?
-// use head and tail pointers. update them using modulo size of buffer
 // n_elem indicates number of elements in history
 
 void addToHistory(char ***argvv, char filev[3][64], int in_background)
@@ -127,28 +123,33 @@ void addToHistory(char ***argvv, char filev[3][64], int in_background)
 
     if (n_elem == history_size)
     {
-        free_command(&history[head]); // at tail or at head
+        // remove oldest command
+        free_command(&history[head]); 
     }
 
+    // store newest command
     store_command(argvv, filev, in_background, &history[tail]);
+
 
     if (n_elem == history_size)
     {
+        //increment head index and wrap around array
         head = (head + 1) % (history_size);
     }
 
     if (n_elem != history_size)
     {
+        // increment number of elements in history if we haven't reached capacity
         ++n_elem;
     }
 
+    // increment tail index and wrap around array
     tail = (tail + 1) % (history_size);
 }
 
 void printHistory()
 {
 
-    // STILL NEED TO ADD FUNCTIONALITY FOR FILE REDIRECTION
     // PRINT TO STANDARD OUTPUT ERROR?
 
     int cur = head;
@@ -159,6 +160,7 @@ void printHistory()
 
         fprintf(stderr, "%d ", num);
 
+        // logic to output name of command(s), including sequences
         for (int i = 0; i < history[cur].num_commands; ++i)
         {
             for (int j = 0; history[cur].argvv[i][j] != NULL; ++j)
@@ -175,18 +177,22 @@ void printHistory()
             }
         }
 
+        // input redirection
         if (strcmp(history[cur].filev[0],"0") != 0) {
             fprintf(stderr, " < %s", history[cur].filev[0]);
         }
 
+        // output redirection
         if (strcmp(history[cur].filev[1],"0") != 0) {
             fprintf(stderr, " > %s", history[cur].filev[1]);
         }
 
+        // error redirection
         if (strcmp(history[cur].filev[2],"0") != 0) {
             fprintf(stderr, " !> %s", history[cur].filev[2]);
         }
 
+        // if command was run in background
         if (history[cur].in_background != 0)
         {
             fprintf(stderr, " &");
@@ -194,8 +200,10 @@ void printHistory()
 
         fprintf(stderr, "\n");
 
+        // move to next element in history and wrap arround array
         cur = (cur + 1) % (history_size);
         num++;
+
     } while ((n_elem == history_size && cur != tail) || (n_elem != history_size && cur < tail));
 }
 
@@ -417,12 +425,13 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        // SOMEHOW RUN SPECIFIED COMMAND HERE
+                        // get command from history
                         struct command specifiedCmd = history[(head + a) % history_size];
-                        // call to generic function here
                         fprintf(stderr, "Running command %d\n", a);
 
-                        print_command(specifiedCmd.argvv, specifiedCmd.filev, specifiedCmd.in_background);
+                        //print_command(specifiedCmd.argvv, specifiedCmd.filev, specifiedCmd.in_background);
+                        
+                        // run command
                         executeCommand(&specifiedCmd, &status);
                     }
                 }
@@ -434,7 +443,7 @@ int main(int argc, char *argv[])
             else
             {
                 // Print command
-                print_command(argvv, filev, in_background);
+                //print_command(argvv, filev, in_background);
 
                 // store command sequence in history
                 addToHistory(argvv, filev, in_background);
@@ -442,6 +451,8 @@ int main(int argc, char *argv[])
                 // STORE ACTUAL COMMAND TO BE RUN
                 struct command curCmd;
                 store_command(argvv, filev, in_background, &curCmd);
+
+                // run command
                 executeCommand(&curCmd, &status);
             }
         }
