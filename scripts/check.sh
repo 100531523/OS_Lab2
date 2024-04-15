@@ -1,2 +1,10 @@
-zsh createzip.zsh
-zsh checker_os_p2.sh ../os_p2_100531523_100495775_100531510.zip
+./createzip.sh
+cp ../src/Makefile Makefile
+cp ../src/libparser.so libparser.so
+./checker_os_p2.sh os_p2_100531523_100495775_100531510.zip
+rm  os_p2_100531523_100495775_100531510.zip 
+rm Makefile
+rm libparser.so
+rm authors.txt
+rm grade.txt
+
