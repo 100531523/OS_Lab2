@@ -175,18 +175,15 @@ void printHistory()
             }
         }
 
-        if (strcmp(history[cur].filev[0], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[0],"0") != 0) {
             fprintf(stderr, " < %s", history[cur].filev[0]);
         }
 
-        if (strcmp(history[cur].filev[1], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[1],"0") != 0) {
             fprintf(stderr, " > %s", history[cur].filev[1]);
         }
 
-        if (strcmp(history[cur].filev[2], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[2],"0") != 0) {
             fprintf(stderr, " !> %s", history[cur].filev[2]);
         }
 
