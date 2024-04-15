@@ -175,6 +175,21 @@ void printHistory()
             }
         }
 
+        if (strcmp(history[cur].filev[0], "0") != 0)
+        {
+            fprintf(stderr, " < %s", history[cur].filev[0]);
+        }
+
+        if (strcmp(history[cur].filev[1], "0") != 0)
+        {
+            fprintf(stderr, " > %s", history[cur].filev[1]);
+        }
+
+        if (strcmp(history[cur].filev[2], "0") != 0)
+        {
+            fprintf(stderr, " !> %s", history[cur].filev[2]);
+        }
+
         if (history[cur].in_background != 0)
         {
             fprintf(stderr, " &");
@@ -232,9 +247,9 @@ void executeCommand(struct command *curCmd, int *status)
 
             if (i == 0)
             {
-                if (strcmp(filev[0], "0") != 0)
+                if (strcmp(curCmd->filev[0], "0") != 0)
                 {
-                    int fd_in = open(filev[0], O_RDONLY);
+                    int fd_in = open(curCmd->filev[0], O_RDONLY);
 
                     if (fd_in < 0)
                     {
@@ -258,9 +273,9 @@ void executeCommand(struct command *curCmd, int *status)
 
             if (i == numPipes)
             {
-                if (strcmp(filev[1], "0") != 0)
+                if (strcmp(curCmd->filev[1], "0") != 0)
                 {
-                    int fd_out = open(filev[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                    int fd_out = open(curCmd->filev[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
                     if (fd_out < 0)
                     {
@@ -270,9 +285,9 @@ void executeCommand(struct command *curCmd, int *status)
                     dup2(fd_out, STDOUT_FILENO);
                     close(fd_out);
                 }
-                if (strcmp(filev[2], "0") != 0)
+                if (strcmp(curCmd->filev[2], "0") != 0)
                 {
-                    int fd_err = open(filev[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                    int fd_err = open(curCmd->filev[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
                     if (fd_err < 0)
                     {
@@ -317,111 +332,6 @@ void executeCommand(struct command *curCmd, int *status)
     {
         printf("Child process identifier: %d\n", getpid());
     }
-    /*
-    int pid = fork();
-    switch (pid)
-    {
-    case -1:
-        perror("Error in fork");
-        exit(-1);
-
-    case 0: // child
-        getCompleteCommand(curCmd->argvv, 0);
-
-        if (curCmd->num_commands == 2)
-        {
-            int fd[2];
-            if (pipe(fd) < 0)
-            {
-                perror("Error with pipe");
-                exit(-1);
-            }
-            int pid2 = fork();
-            switch (pid2)
-            {
-            case -1:
-                perror("Error in fork");
-                exit(-1);
-            case 0: // grandchild, run first command
-                close(fd[0]);
-                close(STDOUT_FILENO);
-                dup(fd[1]);
-                close(fd[1]);
-                execvp(argv_execvp[0], argv_execvp);
-                perror("Error in exec call");
-                break;
-            default: // still child, runs second command
-                getCompleteCommand(curCmd->argvv, 1);
-                close(fd[1]);
-                close(STDIN_FILENO);
-                dup(fd[0]);
-                close(fd[0]);
-                execvp(argv_execvp[0], argv_execvp);
-                perror("Error in exec call");
-                break;
-            }
-        }
-        else
-        {
-
-
-
-            if (strcmp(filev[0], "0") != 0)
-            {
-                int fd_in = open(filev[0], O_RDONLY);
-
-                if (fd_in < 0)
-                {
-                    perror("Error opening file");
-                }
-
-                dup2(fd_in, STDIN_FILENO);
-                close(fd_in);
-            }
-            if (strcmp(filev[1], "0") != 0)
-            {
-                int fd_out = open(filev[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-                if (fd_out < 0)
-                {
-                    perror("Error opening file");
-                }
-
-                dup2(fd_out, STDOUT_FILENO);
-                close(fd_out);
-            }
-            if (strcmp(filev[2], "0") != 0)
-            {
-                int fd_err = open(filev[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-                if (fd_err < 0)
-                {
-                    perror("Error opening file");
-                }
-
-                dup2(fd_err, STDERR_FILENO);
-                close(fd_err);
-            }
-
-
-
-            execvp(argv_execvp[0], argv_execvp);
-            perror("Error in exec call");
-            break;
-        }
-
-    default: // parent
-        if (curCmd->in_background == 0)
-        {
-            while (wait(status) != pid)
-                ;
-        }
-        else
-        {
-            printf("Child process identifier: %d\n", pid);
-        }
-        break;
-    } */
 }
 
 /**
@@ -515,7 +425,7 @@ int main(int argc, char *argv[])
                         // call to generic function here
                         fprintf(stderr, "Running command %d\n", a);
 
-                        // THIS WILL BE THE FUNCTION TO EXECUTE A COMMAND PASSED AS A PARAMETER
+                        print_command(specifiedCmd.argvv, specifiedCmd.filev, specifiedCmd.in_background);
                         executeCommand(&specifiedCmd, &status);
                     }
                 }
