@@ -155,6 +155,11 @@ void printHistory()
     int cur = head;
     int num = 0;
 
+    if (n_elem == 0) {
+        // don't print anything if history empty
+        return;
+    }
+
     do
     {
 
