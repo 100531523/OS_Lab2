@@ -214,7 +214,7 @@ void printHistory()
 // Initialize Acc with a value of 0.
 //REMAKR: The initial value of Acc is 0. During several sums, that value is increased, 
     //never set to 0 again.
-Acc = 0
+Acc = 0;
 // Convert Acc to string and set it as an environment variable
 char acc_str[12];
 sprintf(acc_str, "%d", Acc);
