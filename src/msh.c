@@ -212,10 +212,10 @@ void printHistory()
 int Acc = 0;
 void mycalc(char* operand1, char* operator, char* operand2) {
     if (operand1 == NULL || operator == NULL || operand2 == NULL) {
-        fprintf(stderr, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+        fprintf(stdin, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
         return;
     }
-
+    
     int op1 = atoi(operand1);
     int op2 = atoi(operand2);
 
@@ -235,7 +235,7 @@ void mycalc(char* operand1, char* operator, char* operand2) {
         int remainder = op1 % op2;
         fprintf(stderr, "[OK] %d / %d = %d; Remainder %d\n", op1, op2, quotient, remainder);
     } else {
-        fprintf(stderr, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+        fprintf(stdin, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
     }
 }
 /*mycalc*/
