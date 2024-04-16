@@ -211,22 +211,28 @@ void printHistory()
 /*mycalc*/
 int Acc = 0;
 void mycalc(char* operand1, char* operator, char* operand2) {
+
     if (operand1 == NULL || operator == NULL || operand2 == NULL) {
-        fprintf(stdin, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+        fprintf(stdout, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
         return;
     }
-    
+
     int op1 = atoi(operand1);
     int op2 = atoi(operand2);
 
-    if (strcmp(operator, "add") == 0) {
+    if (strcmp(operator, "add") == 0)
+    {
         int result = op1 + op2;
         Acc += result;
         fprintf(stderr, "[OK] %d + %d = %d; Acc %d\n", op1, op2, result, Acc);
-    } else if (strcmp(operator, "mul") == 0) {
+    } 
+    else if (strcmp(operator, "mul") == 0)
+    {
         int result = op1 * op2;
         fprintf(stderr, "[OK] %d * %d = %d\n", op1, op2, result);
-    } else if (strcmp(operator, "div") == 0) {
+    } 
+    else if (strcmp(operator, "div") == 0)
+    {
         if (op2 == 0) {
             fprintf(stderr, "[ERROR] Division by zero is not allowed.\n");
             return;
@@ -234,8 +240,10 @@ void mycalc(char* operand1, char* operator, char* operand2) {
         int quotient = op1 / op2;
         int remainder = op1 % op2;
         fprintf(stderr, "[OK] %d / %d = %d; Remainder %d\n", op1, op2, quotient, remainder);
-    } else {
-        fprintf(stdin, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+    } 
+    else
+    {
+        fprintf(stdout, "[ERROR] The structure of the command is mycalc <operand_1> <add/mul/div> <operand_2>\n");
     }
 }
 /*mycalc*/
