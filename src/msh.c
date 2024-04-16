@@ -214,11 +214,7 @@ void printHistory()
 // Initialize Acc with a value of 0.
 //REMAKR: The initial value of Acc is 0. During several sums, that value is increased, 
     //never set to 0 again.
-Acc = 0;
-// Convert Acc to string and set it as an environment variable
-char acc_str[12];
-sprintf(acc_str, "%d", Acc);
-setenv("Acc", acc_str, 1);
+
 
 void mycalc(char* operand1, char* operator, char* operand2) 
 {
@@ -232,7 +228,8 @@ void mycalc(char* operand1, char* operator, char* operand2)
 
     // Get the value of Acc(the enviroment variable) from the environment using getenv()
     char* acc_str = getenv("Acc"); // REMARK: The enviroment variables are strings
-    // Turn the variable into an integer
+    // Set Acc  variable to 0 if the Acc variable is null, as this would mean that it has 
+        // just been created. If it's not null, set Acc to the value of the enviroment variable.
     int Acc = acc_str ? atoi(acc_str) : 0;
 
     // Transform the inputs (strings) of the operands into integers
