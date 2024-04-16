@@ -208,7 +208,36 @@ void printHistory()
 }
 
 /* myhistory */
+/*mycalc*/
+void mycalc(char* operand1, char* operator, char* operand2) {
+    if (operand1 == NULL || operator == NULL || operand2 == NULL) {
+        fprintf(stderr, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+        return;
+    }
 
+    int op1 = atoi(operand1);
+    int op2 = atoi(operand2);
+
+    if (strcmp(operator, "add") == 0) {
+        int result = op1 + op2;
+        Acc += result;
+        fprintf(stderr, "[OK] %d + %d = %d; Acc %d\n", op1, op2, result, Acc);
+    } else if (strcmp(operator, "mul") == 0) {
+        int result = op1 * op2;
+        fprintf(stderr, "[OK] %d * %d = %d\n", op1, op2, result);
+    } else if (strcmp(operator, "div") == 0) {
+        if (op2 == 0) {
+            fprintf(stderr, "[ERROR] Division by zero is not allowed.\n");
+            return;
+        }
+        int quotient = op1 / op2;
+        int remainder = op1 % op2;
+        fprintf(stderr, "[OK] %d / %d = %d; Remainder %d\n", op1, op2, quotient, remainder);
+    } else {
+        fprintf(stderr, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
+    }
+}
+/*mycalc*/
 /**
  * Get the command with its parameters for execvp
  * Execute this instruction before run an execvp to obtain the complete command
@@ -439,6 +468,11 @@ int main(int argc, char *argv[])
                 {
                     run_history = 1;
                 }
+
+            }
+            else if(strcmp(argvv[0][0], "mycalc") == 0)
+            {
+                mycalc(argvv[0][1],argvv[0][2],argvv[0][3]);
             }
             else
             {
