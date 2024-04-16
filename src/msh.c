@@ -216,6 +216,9 @@ void mycalc(char* operand1, char* operator, char* operand2) {
         fprintf(stdout, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
         return;
     }
+     // Get the value of Acc from the environment
+    char* acc_str = getenv("Acc");
+    int Acc = acc_str ? atoi(acc_str) : 0;
 
     int op1 = atoi(operand1);
     int op2 = atoi(operand2);
@@ -224,7 +227,14 @@ void mycalc(char* operand1, char* operator, char* operand2) {
     {
         int result = op1 + op2;
         Acc += result;
+        
+        // Convert Acc to string and set it as an environment variable
+        char acc_str[12];
+        sprintf(acc_str, "%d", Acc);
+        setenv("Acc", acc_str, 1);
+
         fprintf(stderr, "[OK] %d + %d = %d; Acc %d\n", op1, op2, result, Acc);
+
     } 
     else if (strcmp(operator, "mul") == 0)
     {
