@@ -209,6 +209,7 @@ void printHistory()
 
 /* myhistory */
 /*mycalc*/
+int Acc = 0;
 void mycalc(char* operand1, char* operator, char* operand2) {
     if (operand1 == NULL || operator == NULL || operand2 == NULL) {
         fprintf(stderr, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
