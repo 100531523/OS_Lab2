@@ -124,15 +124,16 @@ void addToHistory(char ***argvv, char filev[3][64], int in_background)
     if (n_elem == history_size)
     {
         // remove oldest command
-        free_command(&history[head]);
+        free_command(&history[head]); 
     }
 
     // store newest command
     store_command(argvv, filev, in_background, &history[tail]);
 
+
     if (n_elem == history_size)
     {
-        // increment head index and wrap around array
+        //increment head index and wrap around array
         head = (head + 1) % (history_size);
     }
 
@@ -153,12 +154,6 @@ void printHistory()
 
     int cur = head;
     int num = 0;
-
-    if (n_elem == 0)
-    {
-        // don't print anything if history empty
-        return;
-    }
 
     do
     {
@@ -183,20 +178,17 @@ void printHistory()
         }
 
         // input redirection
-        if (strcmp(history[cur].filev[0], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[0],"0") != 0) {
             fprintf(stderr, " < %s", history[cur].filev[0]);
         }
 
         // output redirection
-        if (strcmp(history[cur].filev[1], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[1],"0") != 0) {
             fprintf(stderr, " > %s", history[cur].filev[1]);
         }
 
         // error redirection
-        if (strcmp(history[cur].filev[2], "0") != 0)
-        {
+        if (strcmp(history[cur].filev[2],"0") != 0) {
             fprintf(stderr, " !> %s", history[cur].filev[2]);
         }
 
@@ -216,53 +208,87 @@ void printHistory()
 }
 
 /* myhistory */
-/*mycalc*/
-int Acc = 0;
-void mycalc(char *operand1, char *operator, char * operand2)
-{
 
-    if (operand1 == NULL || operator== NULL || operand2 == NULL)
-    {
+/*mycalc:*/
+// Set the initial value (Acc = 0) for the enviroment variable Acc
+// Initialize Acc with a value of 0.
+//REMAKR: The initial value of Acc is 0. During several sums, that value is increased, 
+    //never set to 0 again.
+Acc = 0
+// Convert Acc to string and set it as an environment variable
+char acc_str[12];
+sprintf(acc_str, "%d", Acc);
+setenv("Acc", acc_str, 1);
+
+void mycalc(char* operand1, char* operator, char* operand2) 
+{
+    // Check that some operand and operator have been inputted (even if they are wrong)
+    if (operand1 == NULL || operator == NULL || operand2 == NULL) {
+        // If no valid input has been given an error is shown with the correct format of the instruction
+        // REMARK: The erro must be printed in the stdout
         fprintf(stdout, "[ERROR] The structure of the command is mycalc <operand 1> <add/mul/div> <operand 2>\n");
         return;
     }
-    // Get the value of Acc from the environment
-    char *acc_str = getenv("Acc");
+
+    // Get the value of Acc(the enviroment variable) from the environment using getenv()
+    char* acc_str = getenv("Acc"); // REMARK: The enviroment variables are strings
+    // Turn the variable into an integer
     int Acc = acc_str ? atoi(acc_str) : 0;
 
+    // Transform the inputs (strings) of the operands into integers
     int op1 = atoi(operand1);
     int op2 = atoi(operand2);
 
-    if (strcmp(operator, "add") == 0)
+    // Check the value for the operator
+    if (strcmp(operator, "add") == 0) //If the operator is add.
     {
+        // Add both operands into result
         int result = op1 + op2;
+        // Add result into the enviroment variable.
         Acc += result;
-
+        
         // Convert Acc to string and set it as an environment variable
         char acc_str[12];
         sprintf(acc_str, "%d", Acc);
+        // REMARK: The setenv() methods takes three arguments, the third one 
+            // is whether the current enviroment variable with the same name should 
+            // be overwritten. This is true for this case (therefore the 1)
         setenv("Acc", acc_str, 1);
-
+        // Print the output for the mycalc
+        // REMARK: This output is printed in the stderr
         fprintf(stderr, "[OK] %d + %d = %d; Acc %d\n", op1, op2, result, Acc);
-    }
-    else if (strcmp(operator, "mul") == 0)
+
+    } 
+    else if (strcmp(operator, "mul") == 0) // If the operator is mul
     {
+        // Mul both operands into result
         int result = op1 * op2;
+        /// Print the output for the mycalc
+        // REMARK: This output is printed in the stderr
         fprintf(stderr, "[OK] %d * %d = %d\n", op1, op2, result);
-    }
-    else if (strcmp(operator, "div") == 0)
+    } 
+    else if (strcmp(operator, "div") == 0) // If the operator is div
     {
-        if (op2 == 0)
-        {
-            fprintf(stderr, "[ERROR] Division by zero is not allowed.\n");
+        // Check for division by 0
+        if (op2 == 0) // If dividing by 0
+        { 
+            // Raise an error if dividing by 0
+            // REMARK: Error is raised in stdout
+            fprintf(stdout, "[ERROR] Division by zero is not allowed.\n");
             return;
         }
+        // Get quoutient and remainder
         int quotient = op1 / op2;
         int remainder = op1 % op2;
+
+        // Print the output for the mycalc
+        // REMARK: This output is printed in the stderr
         fprintf(stderr, "[OK] %d / %d = %d; Remainder %d\n", op1, op2, quotient, remainder);
-    }
-    else
+    } 
+    else // The operator is none of the correct ones
     {
+        // Raise an error with the correct command structure that should be inputed
+        // REMARK: This error is raised in stdout
         fprintf(stdout, "[ERROR] The structure of the command is mycalc <operand_1> <add/mul/div> <operand_2>\n");
     }
 }
@@ -285,12 +311,6 @@ void getCompleteCommand(char ***argvv, int num_command)
         argv_execvp[i] = argvv[num_command][i];
 }
 
-/**
- * Executes the command passed through the parser while accounting for
- * file redirection, command sequences, and background processes
- * @param curCmd the sequence of commands to be executed
- * @param status the status of the command
- */
 void executeCommand(struct command *curCmd, int *status)
 {
 
@@ -298,7 +318,6 @@ void executeCommand(struct command *curCmd, int *status)
 
     int pipefds[2 * numPipes];
 
-    // initializes all of the pipes needed based on the # of commands
     for (int i = 0; i < numPipes; i++)
     {
         if (pipe(pipefds + (i * 2)) < 0)
@@ -308,17 +327,13 @@ void executeCommand(struct command *curCmd, int *status)
         }
     }
 
-    // for each command in the sequence, this loop executes it and determines when to handle
-    // input/output redirection
     for (int i = 0; i < curCmd->num_commands; i++)
     {
         int pid = fork();
 
-        // child process runs through here
         if (pid == 0)
-        {
+        { // child process things
 
-            // if it's the first command in the sequence, handle input redirection
             if (i == 0)
             {
                 if (strcmp(curCmd->filev[0], "0") != 0)
@@ -335,19 +350,16 @@ void executeCommand(struct command *curCmd, int *status)
                 }
             }
 
-            // if its not the last command, handle the piping to next command
             if (i > 0)
             {
                 dup2(pipefds[(i - 1) * 2], STDIN_FILENO);
             }
 
-            // if its not the first command, handle piping in from previous command
             if (i < numPipes)
             {
                 dup2(pipefds[i * 2 + 1], STDOUT_FILENO);
             }
 
-            // if its the last command, handle output and error redirection
             if (i == numPipes)
             {
                 if (strcmp(curCmd->filev[1], "0") != 0)
@@ -376,13 +388,11 @@ void executeCommand(struct command *curCmd, int *status)
                 }
             }
 
-            // close all pipes in the child process
             for (int j = 0; j < 2 * numPipes; j++)
             {
                 close(pipefds[j]);
             }
 
-            // execute the command
             getCompleteCommand(curCmd->argvv, i);
             execvp(argv_execvp[0], argv_execvp);
             perror("Error in exec call");
@@ -394,13 +404,12 @@ void executeCommand(struct command *curCmd, int *status)
             exit(-1);
         }
     }
-    // Parent process closes all pipes
+
     for (int i = 0; i < 2 * numPipes; i++)
     {
         close(pipefds[i]);
     }
 
-    // Background evaluation, determines whether or not to wait for children to finish.
     if (curCmd->in_background == 0)
     {
         for (int i = 0; i < curCmd->num_commands; i++)
@@ -504,8 +513,8 @@ int main(int argc, char *argv[])
                         struct command specifiedCmd = history[(head + a) % history_size];
                         fprintf(stderr, "Running command %d\n", a);
 
-                        // print_command(specifiedCmd.argvv, specifiedCmd.filev, specifiedCmd.in_background);
-
+                        //print_command(specifiedCmd.argvv, specifiedCmd.filev, specifiedCmd.in_background);
+                        
                         // run command
                         executeCommand(&specifiedCmd, &status);
                     }
@@ -514,15 +523,16 @@ int main(int argc, char *argv[])
                 {
                     run_history = 1;
                 }
+
             }
-            else if (strcmp(argvv[0][0], "mycalc") == 0)
+            else if(strcmp(argvv[0][0], "mycalc") == 0)
             {
-                mycalc(argvv[0][1], argvv[0][2], argvv[0][3]);
+                mycalc(argvv[0][1],argvv[0][2],argvv[0][3]);
             }
             else
             {
                 // Print command
-                // print_command(argvv, filev, in_background);
+                //print_command(argvv, filev, in_background);
 
                 // store command sequence in history
                 addToHistory(argvv, filev, in_background);
